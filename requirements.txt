@@ -29,3 +29,4 @@ cryptography
 stqdm
 streamlit-option-menu
 streamlit_extras
+python-dotenv
