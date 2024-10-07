@@ -17,11 +17,11 @@ from czsc.strategies import CzscStrategyExample2
 dummy = czsc.DummyBacktest(strategy=CzscStrategyExample2, read_bars=get_raw_bars,
                            signals_module_name='czsc.signals',
                            sdt='20200101', edt='20230301',
-                           signals_path=r'D:\QMT投研\CzscStocksBeta\signals',
-                           results_path=r'D:\QMT投研\CzscStocksBeta\results_20200101_20230301')
+                           signals_path=r'/Users/gxj/CzscStocksBeta/signals',
+                           results_path=r'/Users/gxj/CzscStocksBeta/results_20200101_20230301')
 
 # 定义需要回测的品种，这里可以自定义
-symbols = get_symbols('A股主要指数')
+symbols = get_symbols('外汇')
 
 # # 查看某个品种的交易回放
 # dummy.replay(symbols[0])

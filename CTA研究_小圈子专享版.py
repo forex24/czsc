@@ -22,6 +22,8 @@ from streamlit_option_menu import option_menu
 
 st.set_page_config(layout="wide", page_title="CTA研究", page_icon="🧭")
 
+os.environ['base_path']='/Users/gxj/策略研究'
+os.environ['signals_module_name'] = 'czsc.signals'
 
 # ======================================================================================================================
 # 信号工具相关功能
@@ -351,7 +353,7 @@ def show_trader(trader: CzscTrader, files, max_k_num=300):
         for pos in trader.positions:
             bs_df = pd.DataFrame([x for x in pos.operates if x["dt"] >= sdt])
             if not bs_df.empty:
-                bs_df["dt"] = bs_df["dt"].apply(lambda x: freq_end_time(x, Freq(freq)))
+                bs_df["dt"] = bs_df["dt"].apply(lambda x: freq_end_time(x, Freq(freq), market="默认"))
                 bs_df["tag"] = bs_df["op"].apply(lambda x: "triangle-up" if x == Operate.LO else "triangle-down")
                 bs_df["color"] = bs_df["op"].apply(lambda x: "red" if x == Operate.LO else "silver")
                 kline.add_scatter_indicator(
@@ -414,6 +416,8 @@ def init_trader(files, symbol, bar_sdt, sdt, edt):
     :param sdt: 回放开始日期
     :param edt: 回放结束日期
     """
+
+    print("init_trader_symbol:", symbol)
     assert pd.to_datetime(bar_sdt) < pd.to_datetime(sdt) < pd.to_datetime(edt), "回放起止日期设置错误"
 
     json_strategies = {file.name: json.loads(file.getvalue().decode("utf-8")) for file in files}
@@ -675,7 +679,7 @@ def backtest_all(strategies, results_path):
     edt = st.session_state.edt
     max_workers = st.session_state.max_workers
     symbols = get_symbols(group)
-
+    print("bar_sdt:", bar_sdt, "group:", group, "sdt:", sdt, "edt:", edt, "symbols:", symbols)
     if max_workers <= 1:
         for symbol in tqdm(symbols, desc="On Bar 回测进度"):
             symbol_backtest(strategies, symbol, bar_sdt, sdt, edt, results_path)
@@ -695,7 +699,7 @@ def backtest(files):
         col1, col2, col3, col4, col5, col6 = st.columns([1, 1, 1, 1, 1, 1])
         bar_sdt = col2.date_input(label="行情开始日期", value=pd.to_datetime("2018-01-01"))
         group = col1.selectbox(
-            label="回测品类", options=["A股主要指数", "A股场内基金", "中证500成分股", "期货主力"], index=3
+            label="回测品类", options=["A股主要指数", "A股场内基金", "中证500成分股", "期货主力", "外汇"], index=3
         )
         sdt = col3.date_input(
             label="回测开始日期", value=pd.to_datetime("2019-01-01"), min_value=pd.to_datetime(bar_sdt)
@@ -747,7 +751,7 @@ def backtest(files):
 
     backtest_all(strategies, results_path)
 
-    file_traders = glob.glob(rf"{results_path}\*.trader")
+    file_traders = glob.glob(fr"{results_path}\*.trader")
     if not file_traders:
         st.warning("当前回测参数下，没有任何标的回测结果；请调整回测参数后重试")
         st.stop()
