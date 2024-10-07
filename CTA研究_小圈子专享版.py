@@ -652,6 +652,7 @@ def symbol_backtest(strategies, symbol, bar_sdt, sdt, edt, results_path):
     :param edt: 回测结束日期
     :param results_path: 回测结果保存路径
     """
+    logger.info(f"backtesting {symbol}，result in {results_path}")
     file_trader = results_path / f"{symbol}.trader"
     if file_trader.exists():
         logger.info(f"{symbol} 已回测，跳过")
@@ -751,7 +752,8 @@ def backtest(files):
 
     backtest_all(strategies, results_path)
 
-    file_traders = glob.glob(fr"{results_path}\*.trader")
+    file_traders = glob.glob(fr"{results_path}/*.trader")
+    #logger.info(f"{file_traders} lookup result")
     if not file_traders:
         st.warning("当前回测参数下，没有任何标的回测结果；请调整回测参数后重试")
         st.stop()
@@ -786,6 +788,7 @@ def backtest(files):
 
 
 def main():
+    logger.add("cta.log", format="{time} {level} {message}", level="INFO", rotation="10 MB")
     with st.sidebar:
         # https://icons.getbootstrap.com/
         selected = option_menu(
