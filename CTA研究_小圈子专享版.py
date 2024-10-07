@@ -1,3 +1,4 @@
+from datetime import datetime
 import glob
 import hashlib
 import inspect
@@ -698,18 +699,28 @@ def backtest(files):
     st.subheader("策略回测", divider="rainbow")
     with st.form(key="my_form_czsc"):
         col1, col2, col3, col4, col5, col6 = st.columns([1, 1, 1, 1, 1, 1])
-        bar_sdt = col2.date_input(label="行情开始日期", value=pd.to_datetime("2018-01-01"))
         group = col1.selectbox(
             label="回测品类", options=["A股主要指数", "A股场内基金", "中证500成分股", "期货主力", "外汇"], index=3
         )
+
+        bar_sdt = col2.date_input(
+            label="行情开始日期", 
+            value=pd.to_datetime("2018-01-01"),
+            min_value=pd.to_datetime("2001-01-01"),
+            max_value=datetime.now(),
+        )
+
         sdt = col3.date_input(
-            label="回测开始日期", value=pd.to_datetime("2019-01-01"), min_value=pd.to_datetime(bar_sdt)
+            label="回测开始日期", 
+            value=pd.to_datetime("2019-01-01"), 
+            min_value=pd.to_datetime("2001-01-01"),
+            max_value=datetime.now(),
         )
         edt = col4.date_input(
             label="回测结束日期",
             value=pd.to_datetime("2021-01-01"),
-            min_value=pd.to_datetime(sdt),
-            max_value=pd.to_datetime("2023-01-01"),
+            min_value=pd.to_datetime("2001-01-01"),
+            max_value=datetime.now(),
         )
         max_workers = int(
             col5.number_input(label="指定进程数量", value=cpu_count() // 4, min_value=1, max_value=cpu_count() // 2)
